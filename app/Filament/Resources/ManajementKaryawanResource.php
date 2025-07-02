@@ -7,6 +7,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use App\Traits\ShieldableResource;
 use Filament\Forms\Components\Card;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
@@ -27,9 +28,16 @@ use App\Models\manajement\ManajementKaryawan as ManajementManajementKaryawan;
 
 class ManajementKaryawanResource extends Resource
 {
+    use ShieldableResource;
+
     protected static ?string $model = ManajementManajementKaryawan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    public static function getSlug(): string
+    {
+        return 'manajement::karyawan';
+    }
 
     protected static ?string $navigationGroup = 'Manajement Karyawan';
 

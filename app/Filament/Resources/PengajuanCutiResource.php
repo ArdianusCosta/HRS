@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\PengejuanCuti;
 use Filament\Resources\Resource;
+use App\Traits\ShieldableResource;
 use Filament\Forms\Components\Card;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -22,7 +23,14 @@ use App\Filament\Resources\PengajuanCutiResource\RelationManagers;
 
 class PengajuanCutiResource extends Resource
 {
+    use ShieldableResource;
+
     protected static ?string $model = PengejuanCuti::class;
+
+    public static function getSlug(): string
+    {
+        return 'pengajuan::cuti';
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

@@ -7,6 +7,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use App\Traits\ShieldableResource;
 use Filament\Forms\Components\Card;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -18,9 +19,16 @@ use App\Filament\Resources\MasterDataPosisiResource\RelationManagers;
 
 class MasterDataPosisiResource extends Resource
 {
+    use ShieldableResource;
+
     protected static ?string $model = ManajementPosisi::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';
+
+    public static function getSlug(): string
+    {
+        return 'master::data::posisi';
+    }
 
     protected static ?string $navigationGroup = 'Master Data';
 

@@ -2,23 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Traits\ShieldableResource;
+use Filament\Forms\Components\Card;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\manajement\ManajementDepartement;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MasterDataDepartementResource\Pages;
 use App\Filament\Resources\MasterDataDepartementResource\RelationManagers;
-use App\Models\manajement\ManajementDepartement;
-use Filament\Forms;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MasterDataDepartementResource extends Resource
 {
+    use ShieldableResource;
+
     protected static ?string $model = ManajementDepartement::class;
+
+    public static function getSlug(): string
+    {
+        return 'master::data::departement';
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
