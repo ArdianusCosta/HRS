@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use App\Traits\ShieldableResource;
 use Filament\Forms\Components\Card;
@@ -21,6 +22,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ManajementKaryawanResource\Pages;
 use App\Filament\Resources\ManajementKaryawanResource\RelationManagers;
@@ -89,16 +92,20 @@ class ManajementKaryawanResource extends Resource
     {
         return $table
            ->columns([
-                TextColumn::make('kode_id')->label('NIK')->searchable()->sortable()->toggleable(),
+                ImageColumn::make('foto_karyawan')
+                ->label('Profile')
+                ->disk('public')
+                ->toggleable(isToggledHiddenByDefault: true)
+                ->getStateUsing(fn ($record) => $record->foto_karyawan ? asset('storage/' . $record->foto_karyawan) : null)
+                ->circular()
+                ->size(40),
                 TextColumn::make('nama')->label('Nama')->searchable()->sortable(),
-                TextColumn::make('email')->label('Email')->searchable(),
+                TextColumn::make('email')->label('Email')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')->label('No. HP'),
                 TextColumn::make('jenis_kelamin')->label('Gender'),
                 TextColumn::make('tanggal_lahir')->label('Tanggal Lahir')->date('d M Y'),
                 TextColumn::make('tanggal_masuk')->label('Tanggal Masuk')->date('d M Y'),
-                ImageColumn::make('foto_karyawan')->label('Foto')->disk('public'),
-                TextColumn::make('alamat')->label('Alamat')->limit(30)->toggleable(true),
-            ])
+           ])
             ->filters([
                 SelectFilter::make('jenis_kelamin')
                     ->label('Jenis Kelamin')
@@ -126,6 +133,7 @@ class ManajementKaryawanResource extends Resource
                     )                
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -134,6 +142,43 @@ class ManajementKaryawanResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+        ->schema([
+            \Filament\Infolists\Components\Section::make('Detail Karyawan')
+            ->schema([
+                \Filament\Infolists\Components\Grid::make(2)
+                ->schema([
+                    TextEntry::make('kode_id')->label('NIK'),
+                    TextEntry::make('nama')->label('Nama Lengkap'),
+                    TextEntry::make('email')->label('Email'),
+                    TextEntry::make('phone')->label('Nomor HandPhone'),
+                    TextEntry::make('tanggal_lahir')->label('Tanggal Lahir'),
+                    TextEntry::make('tanggal_masuk')->label('Tanggal Masuk'),
+                    TextEntry::make('jenis_kelamin')->label('Jenis Kelamin'),
+                    TextEntry::make('tanggal_masuk')->label('Tanggal Masuk'),
+                    \Filament\Infolists\Components\Grid::make(1)
+                    ->schema([
+                    ImageEntry::make('foto_karyawan')
+                    ->label('Foto Karyawan')
+                    ->getStateUsing(fn ($record) => $record->foto_karyawan ? asset('storage/' . $record->foto_karyawan) : null)
+                    ->height(120)
+                    ->width(120)
+                    ]),
+                    \Filament\Infolists\Components\Grid::make(1)
+                    ->schema([
+                    TextEntry::make('alamat')->label('Alamat')->columnSpanFull()->html(),
+                    ]),
+                    TextEntry::make('departement.departement')->label('Departemen Karyawan'),
+                    TextEntry::make('posisis.posisi')->label('Posisi Karyawan'),
+                    TextEntry::make('created_at')->label('Dibuat_at'),
+                    TextEntry::make('updated_at')->label('Diperbarui_at'),
+                ]),
+            ])
+        ]);
     }
 
     public static function getRelations(): array
@@ -149,6 +194,7 @@ class ManajementKaryawanResource extends Resource
             'index' => Pages\ListManajementKaryawans::route('/'),
             'create' => Pages\CreateManajementKaryawan::route('/create'),
             'edit' => Pages\EditManajementKaryawan::route('/{record}/edit'),
+            'view' => Pages\ViewManajementKaryawan::route('/{record}/view'),
         ];
     }
 }

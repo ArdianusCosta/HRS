@@ -2,6 +2,7 @@
 
 namespace App\Models\manajement;
 
+use App\Models\Absensi;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,11 @@ class ManajementKaryawan extends Model
 
     public function posisis(){
         return $this->belongsToMany(ManajementPosisi::class,'karyawan_posisi','karyawan_id','posisi_id')->withTimestamps();
+    }
+
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class, 'karyawan_id');
     }
 
 }

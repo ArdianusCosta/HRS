@@ -9,7 +9,7 @@ trait ShieldableResource
 {
     protected static function getResourcePermissionName(): string
     {
-        return static::getSlug(); // ⬅ pakai slug resmi dari resource
+        return static::getSlug(); 
     }
 
     public static function canViewAny(): bool

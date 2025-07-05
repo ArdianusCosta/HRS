@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 class UserObserve
 {
@@ -13,10 +13,11 @@ class UserObserve
      */
     public function created(User $user): void
     {
+        $recepient = Auth::user();
         Notification::make()
-            ->title('Pengguna baru berhasil dibuat')
-            ->body("Nama: {$user->name}")
-            ->sendToDatabase($user); // ✅ ini benar, karena $user adalah instance dari User
+        ->title('Pengguna baru dibuat')
+        ->body('Tambah Data')
+        ->sendToDatabase($recepient);
     }
 
     /**

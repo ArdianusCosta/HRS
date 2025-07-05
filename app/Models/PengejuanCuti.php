@@ -77,16 +77,26 @@ class PengejuanCuti extends ApprovableModel
     /**
      * Siapa saja yang boleh menyetujui
      */
-    public function canBeApprovedBy(?\Illuminate\Contracts\Auth\Authenticatable $user): ?bool
+    public function canBeApprovedBy(?\Illuminate\Contracts\Auth\Authenticatable $user): bool
     {
-        return $this->status === 'pending';
+        if (! $user || $this->status !== 'pending') {
+            return false;
+        }
+    
+        $approvalStatus = $this->approvalStatus;
+    
+        if (! $approvalStatus || ! $approvalStatus->currentStep) {
+            return false;
+        }
+    
+        return $approvalStatus->currentStep->approvers->contains(function ($approver) use ($user) {
+            return $approver->id === $user->id;
+        });
     }
+    
+    public function canBeRejectedBy(?\Illuminate\Contracts\Auth\Authenticatable $user): bool
+    {
+        return $this->canBeApprovedBy($user);
+    }    
 
-    /**
-     * Siapa saja yang boleh menolak
-     */
-   public function canBeRejectedBy(?\Illuminate\Contracts\Auth\Authenticatable $user): ?bool
-{
-    return $this->status === 'pending';
-}
 }

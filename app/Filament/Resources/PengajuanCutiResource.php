@@ -19,6 +19,7 @@ use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PengajuanCutiResource\Pages;
+use RingleSoft\LaravelProcessApproval\Models\ProcessApprovalFlow;
 use App\Filament\Resources\PengajuanCutiResource\RelationManagers;
 
 class PengajuanCutiResource extends Resource
@@ -30,9 +31,13 @@ class PengajuanCutiResource extends Resource
     public static function getSlug(): string
     {
         return 'pengajuan::cuti';
-    }
+    }    
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-sun';
+
+    protected static ?string $navigationGroup = 'Alur Persetujuan Cuti';
+
+    protected static ?string $label = 'Pengajuan Cuti';
 
     public static function form(Form $form): Form
     {
@@ -42,13 +47,10 @@ class PengajuanCutiResource extends Resource
                 ->schema([
                     Select::make('jenis_type')
                         ->label('Jenis Cuti')
-                        ->options([
-                            'tahunan' => 'Cuti Tahunan',
-                            'sakit' => 'Cuti Sakit',
-                            'pribadi' => 'Izin Pribadi',
-                        ])
-                        ->required(),
-
+                        ->options(fn () => ProcessApprovalFlow::pluck('name', 'name'))
+                        ->required()
+                        ->helperText('Pilih jenis pengajuan cuti sesuai alur persetujuan yang tersedia')
+                        ->placeholder('Pilih jenis cuti'),
                     DatePicker::make('mulai_hari')->required(),
                     DatePicker::make('akhir_hari')
                         ->afterOrEqual('mulai_hari')
@@ -81,15 +83,16 @@ class PengajuanCutiResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                    Action::make('approve')
-                    ->label('Setujui')
-                    ->action(fn ($record) => $record->approve(auth()->user()))
-                    ->visible(fn ($record) => $record->canBeApprovedBy(auth()->user())),
-
-                    Action::make('reject')
-                    ->label('Tolak')
-                    ->action(fn ($record) => $record->reject(auth()->user()))
-                    ->visible(fn ($record) => $record->canBeRejectedBy(auth()->user())),         
+                Action::make('approve')
+                ->label('Setujui')
+                ->action(fn ($record) => $record->approve(auth()->user()))
+                ->visible(fn ($record) => $record->canBeApprovedBy(auth()->user())),
+            
+            Action::make('reject')
+                ->label('Tolak')
+                ->action(fn ($record) => $record->reject(auth()->user()))
+                ->visible(fn ($record) => $record->canBeRejectedBy(auth()->user())),
+                     
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
